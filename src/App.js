@@ -1,5 +1,4 @@
-import {React, useState} from 'react'
-import logo from './logo.svg'
+import {React, useState, useEffect} from 'react'
 import './App.css'
 import ItemList from './ItemList'
 import Tooltip from './components/ToolTip/Tooltip'
@@ -8,10 +7,17 @@ const App = () => {
   const [inputText, setInputText] = useState('')
   const [showTip, setShowTip] = useState(false)
   const [items, setItems] = useState([])
-  const [showText, setShowText] = useState(true)
+  useEffect(() => {
+    console.log('init')
+  
+    // return () => {
+    //   second
+    // }
+  }, [])
+  
 
   const addHandler = () => {
-    if(inputText == '' || inputText == ' ') {
+    if(inputText === '' || inputText === ' ') {
       setShowTip(true)
       setTimeout(() => {
         setShowTip(false)
@@ -20,9 +26,8 @@ const App = () => {
       setInputText('')
       setShowTip(false)
       setItems([...items, inputText])
-      localStorage.setItem('test', 1)
     }
-    // localStorage('key', 'value')
+    localStorage.setItem(1, [...items])
   }
 
   const deleteHandler = (e, i) => {
