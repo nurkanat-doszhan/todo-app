@@ -43,6 +43,13 @@
   background-color: #ffc341;
 }
 
+.add-new-elem>span {
+  position: absolute;
+  right: -130px;
+  top: 5px;
+  font-size: 15px;
+}
+
 .item {
   display: flex;
   background-color: #282c34;

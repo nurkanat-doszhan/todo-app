@@ -1,75 +1,142 @@
-import {React, useState, useEffect} from 'react'
-import './App.css'
-import ItemList from './ItemList'
-import Tooltip from './components/ToolTip/Tooltip'
+import { useState, useEffect } from "react";
+import "./App.css";
+import Item from "./Item";
+import Radium from "radium";
+import { fadeIn, fadeOut } from "react-animations";
+import Tooltip from "./components/ToolTip/Tooltip";
 
 const App = () => {
-  const [inputText, setInputText] = useState('')
-  const [showTip, setShowTip] = useState(false)
-  const [items, setItems] = useState([])
+  const [inputText, setInputText] = useState("");
+  const [showTip, setShowTip] = useState(false);
+  const [items, setItems] = useState([]);
+  const [done, setDone] = useState(false);
+  const [anim, setAnim] = useState(true);
+
+  const styles = {
+    fadeIn: {
+      animation: "x 1s",
+      animationName: Radium.keyframes(fadeIn, "fadeIn"),
+    },
+    fadeOut: {
+      animation: "x 1s",
+      animationName: Radium.keyframes(fadeOut, "fadeOut"),
+    },
+    elementStyle: {
+      backgroundColor: "#3dcd3360",
+      borderColor: "#3dcd33",
+    },
+  };
+  let data = JSON.stringify(items);
+
   useEffect(() => {
-    console.log('init')
-  
-    // return () => {
-    //   second
+    /****** Исправить ошибку split ******/
+    /* Uncaught TypeError: Cannot read properties of null (reading 'split') */
+
+    // let str = localStorage.getItem('todos')
+    // let newItems = str.split(',')
+    // if(items.length == 0) {
+    //   return 0
+    // } else {
+    //   setItems(newItems)
     // }
-  }, [])
-  
+    console.log(data)
+
+    return () => {
+      return 0;
+    };
+  }, []);
+
+  const updateLocalStorage = () => {
+    console.log(items);
+    localStorage.setItem("todos", data);
+  };
+
+  const elemHandler = (e) => {
+    setDone(!done);
+    e.stopPropagation();
+  };
 
   const addHandler = () => {
-    if(inputText === '' || inputText === ' ') {
-      setShowTip(true)
+    if (inputText === "" || inputText === " ") {
+      console.log(localStorage.getItem("todos"));
+      setShowTip(true);
       setTimeout(() => {
-        setShowTip(false)
-      }, 2000)
+        setShowTip(false);
+      }, 2000);
     } else {
-      setInputText('')
-      setShowTip(false)
-      setItems([...items, inputText])
+      setAnim(true)
+      setItems([...items, inputText]);
+      setInputText("");
+      setShowTip(false);
+      updateLocalStorage();
     }
-    localStorage.setItem(1, [...items])
-  }
+  };
 
-  const deleteHandler = (e, i) => {
-    let itemIndex = items.indexOf(i)
-    items.splice(itemIndex, 1)
-    setItems([...items])
-    e.stopPropagation()
-  }
+  const deleteHandler = (id, e) => {
+    let itemIndex = items.indexOf();
+    console.log(id, e)
+    items.splice(id, 1);
+    setItems([...items]);
+    setAnim(false);
+    // localStorage.setItem("todos", [...items]);
+    e.stopPropagation();
+  };
 
-  const editHandler = (e, i) => {
-    let s = prompt("Изменить текст", i)
+  const editHandler = (id) => {
+    let s = prompt("Изменить текст", items[id]);
     if (s === null) {
-      e.stopPropagation()
-      return
+      return;
     }
-    let itemIndex = items.indexOf(i);
-    items[itemIndex] = s;
-    setItems([...items])
-    e.stopPropagation()
-  }
+    setItems([...items]);
+    localStorage.setItem("todos", data);
+  };
 
   return (
     <div className="App">
       <h1>Список задач: {items.length}</h1>
       <div className="add">
         <div className="add-new-elem">
-          { showTip ? <Tooltip text="Введите текст" /> : null }
+          {showTip ? <Tooltip text="Введите текст" /> : null}
           <input
-            type="text" value={inputText}
-            onChange={e => setInputText(e.target.value)}
+            type="text"
+            value={inputText}
             placeholder="Добавить задачу"
+            onChange={(e) =>
+              setInputText(e.target.value)}
+            onKeyDown={(e) => {
+              if (e.code === "Enter") {
+                addHandler();
+              }
+            }}
           />
-          <button onClick={addHandler}>Добавить</button>
+          <button onClick={() => addHandler()}>Добавить</button>
+          <span onClick={() =>
+            setItems(localStorage.getItem("todos"))}>
+            Получить данные
+          </span>
         </div>
-        <ItemList
-          items={items}
-          editHandler={(e, i) => editHandler(e, i)}
-          deleteHandler={(e, i) => deleteHandler(e, i)}
-        />
+        {
+          items.map((item, value) => {
+            return (
+              <Item
+                // styles={anim ? styles.fadeIn : styles.fadeOut}
+                key={value}
+                id={value}
+                text={item}
+                done={done}
+                styles={[
+                  anim ? styles.fadeIn : styles.fadeOut,
+                  done ? styles.elementStyle : null ]}
+                elemClick={(e, i) => elemHandler(e, i)}
+                editClick={(e, i) => editHandler(e, i)}
+                deleteClick={(id, e) => deleteHandler(id, e)}
+              />
+            )
+          })
+        }
       </div>
     </div>
   );
-}
+};
 
 export default App;
